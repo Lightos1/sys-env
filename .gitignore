@@ -1,0 +1,11 @@
+output
+build
+
+*.elf
+
+*.nacp
+*.ovl
+
+*.nsp
+*.nso
+*.npdm
