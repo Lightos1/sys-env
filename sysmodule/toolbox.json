@@ -1,0 +1,5 @@
+{
+	"name"  : "sys-env",
+	"tid"   : "420000EEF500042A",
+	"requires_reboot": true
+}

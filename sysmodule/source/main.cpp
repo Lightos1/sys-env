@@ -1,4 +1,6 @@
 #include <switch.h>
+#include <string>
+#include "fs.hpp"
 
 #define INNER_HEAP_SIZE 0x80000
 
@@ -46,11 +48,33 @@ extern "C" {
         smExit();
         fsExit();
     }
+}
 
-    int main() {
-        while (true) {
-            svcSleepThread(1'000'000'000'000);
-        }
+bool IsEmuNand() {
+    splInitialize();
+    u64 out;
+    splGetConfig((SplConfigItem)65007, &out);
+    splExit();
+    return (out != 0);
+}
+
+int main() {
+    std::vector<std::string> entries;
+    bool isEmunand = IsEmuNand();
+
+    Result rc = fs::ParseConfig(entries, isEmunand);
+    if (R_FAILED(rc)) { /* ... */ }
+
+    std::string env, del;
+    if (isEmunand) {
+        env = ".emu.bak";
+        del = ".sys.bak";
+    } else {
+        env = ".sys.bak";
+        del = ".emu.bak";
     }
 
+    fs::EditContent(entries, env, del);
+
+    return 0;
 }
