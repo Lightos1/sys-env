@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <sys/stat.h>
 #include <cstdarg>
+#include "result.hpp"
 
 namespace fs {
 
@@ -35,10 +36,10 @@ namespace fs {
         return str.compare(str.length() - suffix.length(), suffix.length(), suffix) == 0;
     }
 
-    void EditContent(std::vector<std::string> &matchList, std::string &env, std::string &del) {
+    Result EditContent(std::vector<std::string> &matchList, std::string &env, std::string &del) {
         DIR *dir = opendir(CONTENTS);
         if (!dir) {
-            return;
+            return SYSENV_RC(SysEnvResult_OpenContentsFailed);
         }
 
         dirent *entry;
@@ -71,11 +72,15 @@ namespace fs {
             std::string newPath = std::string(CONTENTS) + modified;
 
             if (oldPath != newPath) {
-                rename(oldPath.c_str(), newPath.c_str());
+                if (rename(oldPath.c_str(), newPath.c_str()) != 0) {
+                    closedir(dir);
+                    return SYSENV_RC(SysEnvResult_RenameFailed);
+                }
             }
         }
 
         closedir(dir);
+        R_SUCCEED();
     }
 
     Result FindConfigHeader(std::ifstream &file, std::string &envString) {
@@ -85,11 +90,10 @@ namespace fs {
                 line.pop_back();
             }
 
-            if (line == envString) {
-                return 0;
-            }
+            R_SUCCEED_IF(line == envString);
         }
-        return 1;
+
+        return SYSENV_RC(SysEnvResult_HeaderMissing);
     }
 
     void ReadConfigEntries(std::ifstream &file, std::vector<std::string> &entries) {
@@ -112,27 +116,37 @@ namespace fs {
     }
 
     #define PATH "sdmc:/config/sys-env/config.ini"
-    void EnsureConfigExists() {
+    Result EnsureConfigExists() {
         std::ifstream file(PATH);
-        if (file.good()) {
-            return;
+        R_SUCCEED_IF(file.good());
+
+        if (mkdir("sdmc:/config", 0777) != 0 && errno != EEXIST) {
+            return SYSENV_RC(SysEnvResult_CreateDirectoryFailed);
         }
 
-        mkdir("sdmc:/config", 0777);
-        mkdir("sdmc:/config/sys-env", 0777);
+        if (mkdir("sdmc:/config/sys-env", 0777) != 0 && errno != EEXIST) {
+            return SYSENV_RC(SysEnvResult_CreateDirectoryFailed);
+        }
 
-        std::ofstream createFile(PATH);
-        std::ofstream createLog(FileLogPath);
-        createFile.close();
-        createLog.close();
+        std::ofstream config(PATH);
+        if (!config.is_open()) {
+            return SYSENV_RC(SysEnvResult_CreateFileFailed);
+        }
+
+        std::ofstream log(FileLogPath);
+        if (!log.is_open()) {
+            return SYSENV_RC(SysEnvResult_CreateFileFailed);
+        }
+
+        return SYSENV_RC(SysEnvResult_EmptyConfig);
     }
 
     Result ParseConfig(std::vector<std::string> &entries, bool emuNand) {
-        EnsureConfigExists();
+        R_TRY(EnsureConfigExists());
 
         std::ifstream file(PATH);
         if (!file.is_open()) {
-            return 1;
+            return SYSENV_RC(SysEnvResult_CreateFileFailed);
         }
 
         std::string blackListHeader;
@@ -142,18 +156,15 @@ namespace fs {
             blackListHeader = "[SysNand]";
         }
 
-        Result rc = FindConfigHeader(file, blackListHeader);
-        if (R_FAILED(rc)) {
-            return rc;
-        }
+        R_TRY(FindConfigHeader(file, blackListHeader));
 
         ReadConfigEntries(file, entries);
 
-        if (!entries.empty()) {
-            return 0;
+        if (entries.empty()) {
+            return SYSENV_RC(SysEnvResult_ConfigNotFound);
         }
 
-        return -1;
+        R_SUCCEED();
     }
 
 }

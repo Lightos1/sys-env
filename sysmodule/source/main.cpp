@@ -63,7 +63,10 @@ int main() {
     bool isEmunand = IsEmuNand();
 
     Result rc = fs::ParseConfig(entries, isEmunand);
-    if (R_FAILED(rc)) { /* ... */ }
+    if (R_FAILED(rc)) {
+        fs::Log("Result failed: %u", R_DESCRIPTION(rc));
+        return rc;
+    }
 
     std::string env, del;
     if (isEmunand) {
