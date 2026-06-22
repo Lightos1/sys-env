@@ -1,13 +1,46 @@
 ## Overview
 
-Sys-env can be used to prevent mods or similar from being loaded in sys/emu (which is configureable) <br> <br>
+Sys-env can be used to prevent mods (or similar things) from being loaded in SysNAND / EmuNAND (this is configurable). <br>
 
 ## Usecases:
-The most noteable example are themes: <br>
- - Patches for themes need to match the firmware update, so you will get a crash if you use sys and emunand on different firmware
- - If you only need themes on one of the two, you can block one from being loaded. <br> <br>
+The most notable example is themes: <br>
+ - Theme patches usually need to match the exact firmware version
+   - If SysNAND and EmuNAND are on different firmware, you end up with a crash
+ themes need to match the firmware update, so you will get a crash if you use sys and emunand on different firmware
+ - If you only need themes on just one of the two environments, you can simply block them from loading on the other one
 
-The blocking is done by appending ``.bak`` to the end of the file during boot. <br>
+What this basically does: during boot, it appends .bak to the end of matching directories so they won’t be loaded. <br>
+
+## Usage:
+There is no overlay due to my hatred of writing ui, so you have to configure it via the config. <br>
+This can be done very easily though: <br>
+Edit ``/config/sys-env/config.ini`` and set it up in the following way: <br>
+```
+[SysNand]
+[program id(s) to be blocked in SysNand]
+
+[EmuNand]
+[program id(s) to be blocked in EmuNand]
+```
+
+You have two sections: <br> <br>
+
+[SysNand] <br>
+[EmuNand] <br> <br>
+
+Order doesn’t matter. <br> <br>
+
+Just add the program ID(s) under whichever environment you want them blocked in. <br>
+
+## Example
+
+For instance this config will block themes on ``SysNand``. <br>
+```
+[SysNand]
+01000000000000001000
+
+[EmuNand]
+```
 
 ## Thanks to:
  - Arcdelta for motivating me to actually finish this lmao.
