@@ -5,7 +5,7 @@ Sys-env can be used to prevent mods (or similar things) from being loaded in Sys
 ## Usecases:
 The most notable example is themes: <br>
  - Theme patches usually need to match the exact firmware version
-   - If SysNAND and EmuNAND are on different firmware, you end up with a crash
+   - If SysNand and EmuNand are on different firmware, you end up with a crash
  themes need to match the firmware update, so you will get a crash if you use sys and emunand on different firmware
  - If you only need themes on just one of the two environments, you can simply block them from loading on the other one
 
@@ -23,13 +23,12 @@ Edit ``/config/sys-env/config.ini`` and set it up in the following way: <br>
 [program id(s) to be blocked in EmuNand]
 ```
 
-You have two sections: <br> <br>
+You have two sections: <br>
 
 [SysNand] <br>
-[EmuNand] <br> <br>
+[EmuNand] <br>
 
-Order doesn’t matter. <br> <br>
-
+Order doesn’t matter. <br>
 Just add the program ID(s) under whichever environment you want them blocked in. <br>
 
 ## Example
