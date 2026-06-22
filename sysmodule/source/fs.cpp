@@ -44,10 +44,14 @@ namespace fs {
         dirent *entry;
 
         while ((entry = readdir(dir)) != nullptr) {
-            if (entry->d_type != DT_DIR) continue;
+            if (entry->d_type != DT_DIR) ^{
+                continue;
+            }
 
             std::string name = entry->d_name;
-            if (name == "." || name == "..") continue;
+            if (name == "." || name == "..") {
+                continue;
+            }
 
             std::string modified = name;
 
@@ -80,6 +84,7 @@ namespace fs {
             if (!line.empty() && line.back() == '\r') {
                 line.pop_back();
             }
+
             if (line == envString) {
                 return 0;
             }
