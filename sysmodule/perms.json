@@ -1,19 +1,35 @@
 {
-	"name": "sys-env",
-	"title_id": "0x420000000000042A",
-	"title_id_range_min": "0x420000000000042A",
-	"title_id_range_max": "0x420000000000042A",
-	"main_thread_stack_size": "0x00004000",
-	"main_thread_priority": 63,
-	"default_cpu_id": 3,
-	"process_category": 0,
-	"is_retail": true,
-	"pool_partition": 2,
-	"is_64_bit": true,
-	"address_space_type": 1,
+    "name": "sys-env",
+    "title_id": "0x420000000000042A",
+    "program_id": "0x420000000000042A",
+    "program_id_range_min": "0x420000000000042A",
+    "program_id_range_max": "0x420000000000042A",
+    "title_id_range_min": "0x420000000000042A",
+    "title_id_range_max": "0x420000000000042A",
+    "version": "0",
+    "main_thread_stack_size": "0x00004000",
+    "main_thread_priority": 63,
+    "default_cpu_id": 3,
+    "process_category": "0",
+    "is_retail": true,
+    "pool_partition": 2,
+    "is_64_bit": true,
+    "address_space_type": 1,
+    "system_resource_size": "0x00000000",
+    "optimize_memory_allocation": false,
+    "disable_device_address_space_merge": false,
+    "enable_alias_region_extra_size": false,
+    "prevent_code_reads": false,
+    "signature_key_generation": 0,
 	"filesystem_access": {
 		"permissions": "0xFFFFFFFFFFFFFFFF"
 	},
+    	"service_access": [
+		"*"
+	],
+	"service_host": [
+		"sys:env"
+	],
 	"kernel_capabilities": [
 		{
 			"type": "kernel_flags",
