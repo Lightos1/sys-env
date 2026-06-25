@@ -36,7 +36,7 @@ Just add the program ID(s) under whichever environment you want them blocked in.
 For instance this config will block themes on ``SysNand``. <br>
 ```
 [SysNand]
-01000000000000001000
+0100000000001000
 
 [EmuNand]
 ```
