@@ -74,8 +74,8 @@ namespace fs {
                 modified.erase(modified.length() - del.length());
             }
 
-            // 查找匹配的 ProgramEntry
-            // 同时尝试去掉本侧环境后缀再匹配，以恢复已被阻止的目录
+            // Find matching ProgramEntry
+            // Also try stripping the current env suffix to match previously blocked directories
             std::string matchName = modified;
             if (EndsWith(matchName, env)) {
                 matchName.erase(matchName.length() - env.length());
@@ -92,10 +92,10 @@ namespace fs {
             if (matched != nullptr) {
                 bool shouldBlock;
                 if (matched->hasVersionCheck) {
-                    // 有版本条件：固件不符合条件时才阻止
+                    // Has version condition: block only when firmware doesn't match
                     shouldBlock = !CheckVersion(currentVer, *matched);
                 } else {
-                    // 无版本条件：保持原有行为，始终阻止
+                    // No version condition: always block (original behavior)
                     shouldBlock = true;
                 }
 
@@ -104,7 +104,7 @@ namespace fs {
                         modified += env;
                     }
                 } else {
-                    // 不应阻止：去掉环境后缀以恢复加载
+                    // Should not block: remove env suffix to restore loading
                     if (EndsWith(modified, env)) {
                         modified.erase(modified.length() - env.length());
                     }
@@ -139,11 +139,11 @@ namespace fs {
         return SYSENV_RC(SysEnvResult_HeaderMissing);
     }
 
-    // 解析一行中的版本条件部分，格式: " = >=16.0.0" 或 " = 16.0.0"
+    // Parse the version condition part of a config line, e.g. "= >=16.0.0" or "= 16.0.0"
     Result ParseVersionCondition(const std::string &condition, ProgramEntry &entry) {
         std::string cond = condition;
 
-        // 去掉前导和尾部空格
+        // Strip leading and trailing spaces
         size_t pos = 0;
         while (pos < cond.size() && cond[pos] == ' ') {
             pos++;
@@ -157,7 +157,7 @@ namespace fs {
             return SYSENV_RC(SysEnvResult_InvalidVersionFormat);
         }
 
-        // 检测运算符
+        // Detect operator
         u8 op;
         size_t verStart;
         if (cond.compare(0, 2, ">=") == 0) {
@@ -176,20 +176,20 @@ namespace fs {
             op = OP_EQ;
             verStart = 1;
         } else {
-            // 无运算符，默认精确匹配（兼容 "16.0.0" 直接写的情况）
+            // No operator: default to exact match (supports bare "16.0.0")
             op = OP_EQ;
             verStart = 0;
         }
 
         std::string verStr = cond.substr(verStart);
-        // 去掉版本号前的空格
+        // Strip spaces before version number
         pos = 0;
         while (pos < verStr.size() && verStr[pos] == ' ') {
             pos++;
         }
         verStr = verStr.substr(pos);
 
-        // 解析 MAJOR.MINOR.MICRO
+        // Parse MAJOR.MINOR.MICRO
         u32 major = 0, minor = 0, micro = 0;
         int dots = 0;
         std::string part;
@@ -246,11 +246,11 @@ namespace fs {
             entry.op = OP_EQ;
             entry.version = 0;
 
-            // 查找 '=' 分隔符，拆分程序 ID 和版本条件
+            // Find '=' delimiter to split program ID and version condition
             size_t eqPos = line.find('=');
             if (eqPos != std::string::npos) {
                 entry.id = line.substr(0, eqPos);
-                // 去掉程序 ID 尾部空格
+                // Trim trailing spaces from program ID
                 while (!entry.id.empty() && entry.id.back() == ' ') {
                     entry.id.pop_back();
                 }
@@ -258,7 +258,7 @@ namespace fs {
                 std::string cond = line.substr(eqPos + 1);
                 Result rc = ParseVersionCondition(cond, entry);
                 if (R_FAILED(rc)) {
-                    // 解析失败：跳过此行，记录日志
+                    // Parse failed: skip this line and log
                     Log("Failed to parse version condition: %s", line.c_str());
                     continue;
                 }

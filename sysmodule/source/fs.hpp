@@ -14,8 +14,8 @@ namespace fs {
 
     struct ProgramEntry {
         std::string id;
-        bool hasVersionCheck;   // 是否设置了固件版本条件
-        u8  op;                 // VersionOp 枚举值
+        bool hasVersionCheck;   // true if firmware version condition is set
+        u8  op;                 // VersionOp value
         u32 version;            // MAKEHOSVERSION(major, minor, micro)
     };
 

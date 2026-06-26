@@ -1,31 +1,31 @@
 ;
-; sys-env 配置文件
-; 路径: sdmc:/config/sys-env/config.ini
+; sys-env configuration
+; Path: sdmc:/config/sys-env/config.ini
 ;
-; ========== 格式说明 ==========
+; ========== Format ==========
 ;
-; [SysNand] 下配置在真实系统中阻止的程序
-; [EmuNand] 下配置在虚拟系统中阻止的程序
+; [SysNand]  programs to block in SysNAND
+; [EmuNand]  programs to block in EmuNAND
 ;
-; 每个条目一行: <16位程序ID>[ = <条件><主,次,微>]
+; Each entry: <16-char program ID>[ = <op><major.minor.micro>]
 ;
-; 无版本条件: 始终在当前环境阻止
-; 有版本条件: 仅当固件版本不满足条件时才阻止
+; Without version condition: always blocked in this environment
+; With version condition:    blocked only when firmware does NOT match the condition
 ;
-; ========== 版本条件运算符 ==========
-; = 16.0.0   精确匹配 (等于)
-; >= 16.0.0  大于等于
-; <= 16.0.0  小于等于
-; >  16.0.0  大于
-; <  16.0.0  小于
+; ========== Version Operators ==========
+; = 16.0.0   exact match (equal)
+; >= 16.0.0  greater than or equal
+; <= 16.0.0  less than or equal
+; >  16.0.0  greater than
+; <  16.0.0  less than
 ;
-; ========== 示例 ==========
+; ========== Examples ==========
 
 [SysNand]
-;0100000000001000                  ; 始终在 SysNAND 阻止主题
-;010000000000XXXX = 16.0.0         ; 仅固件不是 16.0.0 时阻止
-;010000000000YYYY = >=17.0.0       ; 仅固件低于 17.0.0 时阻止
+;0100000000001000                  ; Always block themes in SysNAND
+;010000000000XXXX = 16.0.0         ; Block unless firmware is 16.0.0
+;010000000000YYYY = >=17.0.0       ; Block unless firmware >= 17.0.0
 
 [EmuNand]
-;0100000000001000                  ; 始终在 EmuNAND 阻止主题
-;010000000000XXXX = 16.0.0         ; 仅固件不是 16.0.0 时阻止
+;0100000000001000                  ; Always block themes in EmuNAND
+;010000000000XXXX = 16.0.0         ; Block unless firmware is 16.0.0
