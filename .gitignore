@@ -9,3 +9,5 @@ build
 *.nsp
 *.nso
 *.npdm
+*.zip
+sdout/

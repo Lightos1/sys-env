@@ -1,10 +1,8 @@
 #include <switch.h>
 #include <fstream>
 #include <string>
-#include <iostream>
 #include <vector>
 #include <dirent.h>
-#include <algorithm>
 #include <sys/stat.h>
 #include <cstdarg>
 #include "result.hpp"
@@ -196,6 +194,9 @@ namespace fs {
             if (c >= '0' && c <= '9') {
                 part += c;
             } else if (c == '.') {
+                if (part.empty()) {
+                    return SYSENV_RC(SysEnvResult_InvalidVersionFormat);
+                }
                 if (dots == 0) {
                     major = std::stoul(part);
                 } else if (dots == 1) {
