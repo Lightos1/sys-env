@@ -31,12 +31,37 @@ You have two sections: <br>
 Order doesn’t matter. <br>
 Just add the program ID(s) under whichever environment you want them blocked in. <br>
 
+### Firmware Version Conditions (Optional)
+
+Each program ID can optionally include a firmware version condition. <br>
+When a condition is set, the program is **only blocked if the current firmware does NOT match the condition**. <br>
+
+Supported operators: `=` (equal), `>=`, `<=`, `>`, `<` <br>
+
+Format: `<program_id> = <operator><major.minor.micro>` <br>
+
+Examples:
+```
+[SysNand]
+0100000000001000                  ; No condition: always blocked in SysNAND
+010000000000XXXX = 16.0.0         ; Blocked unless firmware == 16.0.0
+010000000000YYYY = >=17.0.0       ; Blocked unless firmware >= 17.0.0
+```
+
 ## Example
 
 For instance this config will block themes on ``SysNand``. <br>
 ```
 [SysNand]
 0100000000001000
+
+[EmuNand]
+```
+
+With firmware version conditions — only block a theme if firmware is not 16.0.0: <br>
+```
+[SysNand]
+0100000000001000 = 16.0.0
 
 [EmuNand]
 ```

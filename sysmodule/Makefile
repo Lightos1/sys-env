@@ -146,14 +146,28 @@ ifneq ($(ROMFS),)
 	export NROFLAGS += --romfsdir=$(CURDIR)/$(ROMFS)
 endif
 
-.PHONY: $(BUILD) clean all
+.PHONY: $(BUILD) clean dist all
+
+TITLE_ID := 420000000000042A
+SD_OUT   := sdout
 
 #---------------------------------------------------------------------------------
-all: $(BUILD)
+# default: build + package SD card layout
+dist: $(BUILD)
+	@echo packaging SD layout ...
+	@mkdir -p $(SD_OUT)/atmosphere/contents/$(TITLE_ID)/flags
+	@mkdir -p $(SD_OUT)/config/sys-env
+	@cp $(OUTPUT).nsp $(SD_OUT)/atmosphere/contents/$(TITLE_ID)/exefs.nsp
+	@touch $(SD_OUT)/atmosphere/contents/$(TITLE_ID)/flags/boot2.flag
+	@cp config.ini.template $(SD_OUT)/config/sys-env/config.ini.example
+	@cd $(SD_OUT) && zip -r ../$(TARGET).zip .
+	@echo built $(TARGET).zip
 
 $(BUILD):
 	@[ -d $@ ] || mkdir -p $@
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
+
+all: dist
 
 #---------------------------------------------------------------------------------
 clean:
@@ -163,7 +177,7 @@ ifeq ($(strip $(APP_JSON)),)
 else
 	@rm -fr $(BUILD) $(TARGET).nsp $(TARGET).nso $(TARGET).npdm $(TARGET).elf
 endif
-
+	@rm -fr $(SD_OUT) $(TARGET).zip
 
 #---------------------------------------------------------------------------------
 else

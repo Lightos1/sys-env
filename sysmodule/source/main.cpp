@@ -59,8 +59,9 @@ bool IsEmuNand() {
 }
 
 int main() {
-    std::vector<std::string> entries;
+    std::vector<fs::ProgramEntry> entries;
     bool isEmunand = IsEmuNand();
+    u32 currentVer = hosversionGet();
 
     Result rc = fs::ParseConfig(entries, isEmunand);
     if (R_FAILED(rc)) {
@@ -77,7 +78,7 @@ int main() {
         del = ".emu.bak";
     }
 
-    fs::EditContent(entries, env, del);
+    fs::EditContent(entries, env, del, currentVer);
 
     return 0;
 }

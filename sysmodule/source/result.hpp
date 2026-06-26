@@ -12,6 +12,7 @@ enum SysEnvResult {
     SysEnvResult_CreateFileFailed,
     SysEnvResult_OpenContentsFailed,
     SysEnvResult_RenameFailed,
+    SysEnvResult_InvalidVersionFormat,
 };
 
 #define SYSENV_RC(x) MAKERESULT(SysEnvModule, x)

@@ -1,0 +1,31 @@
+;
+; sys-env configuration
+; Path: sdmc:/config/sys-env/config.ini
+;
+; ========== Format ==========
+;
+; [SysNand]  programs to block in SysNAND
+; [EmuNand]  programs to block in EmuNAND
+;
+; Each entry: <16-char program ID>[ = <op><major.minor.micro>]
+;
+; Without version condition: always blocked in this environment
+; With version condition:    blocked only when firmware does NOT match the condition
+;
+; ========== Version Operators ==========
+; = 16.0.0   exact match (equal)
+; >= 16.0.0  greater than or equal
+; <= 16.0.0  less than or equal
+; >  16.0.0  greater than
+; <  16.0.0  less than
+;
+; ========== Examples ==========
+
+[SysNand]
+;0100000000001000                  ; Always block themes in SysNAND
+;010000000000XXXX = 16.0.0         ; Block unless firmware is 16.0.0
+;010000000000YYYY = >=17.0.0       ; Block unless firmware >= 17.0.0
+
+[EmuNand]
+;0100000000001000                  ; Always block themes in EmuNAND
+;010000000000XXXX = 16.0.0         ; Block unless firmware is 16.0.0

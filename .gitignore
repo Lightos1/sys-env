@@ -9,3 +9,6 @@ build
 *.nsp
 *.nso
 *.npdm
+*.zip
+sdout/
+.DS_Store
