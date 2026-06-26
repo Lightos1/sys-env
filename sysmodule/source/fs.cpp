@@ -143,12 +143,15 @@ namespace fs {
     Result ParseVersionCondition(const std::string &condition, ProgramEntry &entry) {
         std::string cond = condition;
 
-        // 去掉前导空格
+        // 去掉前导和尾部空格
         size_t pos = 0;
         while (pos < cond.size() && cond[pos] == ' ') {
             pos++;
         }
         cond = cond.substr(pos);
+        while (!cond.empty() && cond.back() == ' ') {
+            cond.pop_back();
+        }
 
         if (cond.empty()) {
             return SYSENV_RC(SysEnvResult_InvalidVersionFormat);

@@ -11,3 +11,4 @@ build
 *.npdm
 *.zip
 sdout/
+.DS_Store
