@@ -36,6 +36,55 @@ namespace fs {
         return str.compare(str.length() - suffix.length(), suffix.length(), suffix) == 0;
     }
 
+    std::string StripSuffix(const std::string &str, const std::string &suffix) {
+        if (EndsWith(str, suffix)) {
+            return str.substr(0, str.length() - suffix.length());
+        }
+        return str;
+    }
+
+    bool IsInMatchList(const std::vector<std::string> &matchList, const std::string &name, const std::string &modified) {
+        return std::find(matchList.begin(), matchList.end(), name) != matchList.end() || std::find(matchList.begin(), matchList.end(), modified) != matchList.end();
+    }
+
+    std::string ResolveTargetName(const std::vector<std::string> &matchList, const std::string &name, const std::string &modified, const std::string &env, const std::string &del) {
+        if (IsInMatchList(matchList, name, modified)) {
+            if (!EndsWith(modified, env)) {
+                return modified + env;
+            }
+        } else {
+            if (EndsWith(name, env)) {
+                return StripSuffix(name, env);
+            }
+            if (EndsWith(name, del)) {
+                return StripSuffix(name, del);
+            }
+        }
+        return modified;
+    }
+
+    Result RenameEntry(const std::string &oldPath, const std::string &newPath) {
+        if (oldPath == newPath) {
+            R_SUCCEED();
+        }
+
+        if (rename(oldPath.c_str(), newPath.c_str()) != 0) {
+            return SYSENV_RC(SysEnvResult_RenameFailed);
+        }
+
+        R_SUCCEED();
+    }
+
+    Result ProcessEntry(const std::string &name, std::vector<std::string> &matchList, std::string &env, std::string &del) {
+        std::string modified = StripSuffix(name, env);
+        std::string target = ResolveTargetName(matchList, name, modified, env, del);
+
+        std::string oldPath = std::string(CONTENTS) + name;
+        std::string newPath = std::string(CONTENTS) + target;
+
+        return RenameEntry(oldPath, newPath);
+    }
+
     Result EditContent(std::vector<std::string> &matchList, std::string &env, std::string &del) {
         DIR *dir = opendir(CONTENTS);
         if (!dir) {
@@ -43,7 +92,6 @@ namespace fs {
         }
 
         dirent *entry;
-
         while ((entry = readdir(dir)) != nullptr) {
             if (entry->d_type != DT_DIR) {
                 continue;
@@ -54,28 +102,10 @@ namespace fs {
                 continue;
             }
 
-            std::string modified = name;
-
-            if (EndsWith(modified, del)) {
-                modified.erase(modified.length() - del.length());
-            }
-
-            bool inList = std::find(matchList.begin(), matchList.end(), name) != matchList.end() || std::find(matchList.begin(), matchList.end(), modified) != matchList.end();
-
-            if (inList) {
-                if (!EndsWith(modified, env)) {
-                    modified += env;
-                }
-            }
-
-            std::string oldPath = std::string(CONTENTS) + name;
-            std::string newPath = std::string(CONTENTS) + modified;
-
-            if (oldPath != newPath) {
-                if (rename(oldPath.c_str(), newPath.c_str()) != 0) {
-                    closedir(dir);
-                    return SYSENV_RC(SysEnvResult_RenameFailed);
-                }
+            Result rc = ProcessEntry(name, matchList, env, del);
+            if (R_FAILED(rc)) {
+                closedir(dir);
+                return rc;
             }
         }
 
@@ -159,10 +189,6 @@ namespace fs {
         R_TRY(FindConfigHeader(file, blackListHeader));
 
         ReadConfigEntries(file, entries);
-
-        if (entries.empty()) {
-            return SYSENV_RC(SysEnvResult_ConfigNotFound);
-        }
 
         R_SUCCEED();
     }
