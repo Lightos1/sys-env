@@ -109,6 +109,11 @@ namespace fs {
                         modified.erase(modified.length() - env.length());
                     }
                 }
+            } else {
+                // Not in matchList: clean up orphaned .bak from removed entries
+                if (EndsWith(modified, env)) {
+                    modified.erase(modified.length() - env.length());
+                }
             }
 
             std::string oldPath = std::string(CONTENTS) + name;
@@ -212,7 +217,11 @@ namespace fs {
             }
         }
         if (!part.empty()) {
-            micro = std::stoul(part);
+            if (dots == 0) {
+                major = std::stoul(part);
+            } else {
+                micro = std::stoul(part);
+            }
         }
 
         if (dots > 2) {
