@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) Lightos_
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms and conditions of the GNU General Public License,
+ * version 2, as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 #include <switch.h>
 #include <fstream>
 #include <string>
@@ -7,12 +24,14 @@
 #include <algorithm>
 #include <sys/stat.h>
 #include <cstdarg>
-#include "result.hpp"
+#include "utils.hpp"
 
 namespace fs {
 
     #define CONTENTS "sdmc:/atmosphere/contents/"
     constexpr char FileLogPath[] = "/config/sys-env/log.txt";
+
+    constexpr char SelfProgramId[] = "420000000000042A";
 
     void Log(const char *format, ...) {
         va_list args;
@@ -99,6 +118,11 @@ namespace fs {
 
             std::string name = entry->d_name;
             if (name == "." || name == "..") {
+                continue;
+            }
+
+            // Don't modify sys-env directory
+            if (StripSuffix(StripSuffix(name, env), del) == SelfProgramId) {
                 continue;
             }
 
