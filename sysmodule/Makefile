@@ -60,7 +60,7 @@ CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions
 
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) \
-			-flto -Os -Wl,--gc-sections -Wl,-Map,$(notdir $*.map)
+			-flto -Wl,--gc-sections -Wl,-Map,$(notdir $*.map)
 
 LIBS	:= -lnx
 
