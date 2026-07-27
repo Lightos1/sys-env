@@ -43,3 +43,4 @@ For instance this config will block themes on ``SysNand``. <br>
 
 ## Thanks to
  - Arcdelta for motivating me to actually finish this lmao.
+ - Souldbminerr for creating the overlay
