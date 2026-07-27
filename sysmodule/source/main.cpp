@@ -18,7 +18,7 @@
 #include <switch.h>
 #include <string>
 #include "fs.hpp"
-#include "utils.hpp"
+#include "results.hpp"
 
 #define INNER_HEAP_SIZE 0x80000
 
@@ -71,7 +71,7 @@ extern "C" {
 bool IsEmuNand() {
     splInitialize();
     u64 out;
-    splGetConfig(IS_EMUMMC_CONFIG, &out);
+    splGetConfig((SplConfigItem) 65007, &out);
     splExit();
     return (out != 0);
 }

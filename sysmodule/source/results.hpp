@@ -20,7 +20,6 @@
 #include <switch.h>
 
 constexpr u32 SysEnvModule = 0x42A;
-constexpr SplConfigItem IS_EMUMMC_CONFIG = (SplConfigItem)65007;
 
 enum SysEnvResult {
     SysEnvResult_EmptyConfig = 0,
